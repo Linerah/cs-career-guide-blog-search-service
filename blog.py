@@ -54,7 +54,7 @@ class Blog:
         pipeline = [
             {
                 '$search': {
-                    'index': 'blogs',  # TODO: create search index in Atlas Search
+                    'index': 'blogs',
                     'text': query
                 }
             }
