@@ -60,14 +60,10 @@ class Blog:
             }
         ]
         if not blog_filter and not blog_title:
-            print('No blog title or filter')
             return json.loads(json_util.dumps(collection.find()))
         elif not blog_filter:
-            print('No blog filter')
-            print(list(collection.aggregate(pipeline)))
             return json.loads(json_util.dumps(collection.aggregate(pipeline)))
         elif not blog_title:
-            print('No blog title')
             if blog_filter == "Newest":
                 return json.loads(json_util.dumps(collection.find().sort("date_published", -1)))
             elif blog_filter == "Most read":
@@ -80,19 +76,18 @@ class Blog:
 
         print('Blog title and filter')
         if blog_filter == "Newest":
-            sort_criteria = {"date_published", -1}
+            sort_criteria = {"date_published": -1}
             pipeline.append({"$sort": sort_criteria})
             return json.loads(json_util.dumps(collection.aggregate(pipeline)))
         elif blog_filter == "Most read":
-            sort_criteria = {"read_count", -1}
+            sort_criteria = {"read_count": -1}
             pipeline.append({"$sort": sort_criteria})
             return json.loads(json_util.dumps(collection.aggregate(pipeline)))
         elif blog_filter == "Most upvote":
-            sort_criteria = {"upvote_count", -1}
+            sort_criteria = {"upvote_count": -1}
             pipeline.append({"$sort": sort_criteria})
             return json.loads(json_util.dumps(collection.aggregate(pipeline)))
-
-        sort_criteria = {"date_published", 1}
+        sort_criteria = {"date_published": 1}
         pipeline.append({"$sort": sort_criteria})
         return json.loads(json_util.dumps(collection.aggregate(pipeline)))
 
