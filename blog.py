@@ -1,8 +1,7 @@
 import hashlib
 import json
 import time
-
-from flask import jsonify
+from bson import json_util
 
 
 def generate_blog_id():
@@ -16,9 +15,9 @@ def generate_blog_id():
 
 class Blog:
 
-    def __init__(self, tittle, information, link, user_id):
+    def __init__(self, title, information, link, user_id):
         self.blog_id = generate_blog_id()
-        self.tittle = tittle
+        self.title = title
         self.information = information
         self.link = link
         self.date_published = time.time()
@@ -27,10 +26,10 @@ class Blog:
         self.user_id = user_id
 
     @staticmethod
-    def create_blog(tittle, information, link, user_id, database):
+    def create_blog(title, information, link, user_id, database):
         """ A static method, that creates a blog object and adds it to the database
         """
-        blog = Blog(tittle, information, link, user_id)
+        blog = Blog(title, information, link, user_id)
         blog_document = blog.to_json()
         collection = database.db.blogs
         print(blog_document)
@@ -43,58 +42,63 @@ class Blog:
         """
         collection = database.db.blogs  # TODO: try to see if Atlas search has an AI that orders by relevance
         blogs = collection.find()
-        return list(blogs)
+        return json.loads(json_util.dumps(blogs))
 
     @staticmethod
-    def get_filtered_blogs(database, blog_filter, blog_tittle):
+    def get_filtered_blogs(database, blog_filter, blog_title):
         """ A static method, that filters blogs by the given input from the user
         """
 
         collection = database.db.blogs
-        query = {'query': blog_tittle, 'path': 'blog_tittle'}
+        query = {'query': blog_title, 'path': ['title']}
         pipeline = [
             {
                 '$search': {
-                    'index': 'tittleSearchIndex',  # TODO: create search index in Atlas Search
+                    'index': 'blogs',  # TODO: create search index in Atlas Search
                     'text': query
                 }
             }
         ]
-        if not blog_filter and not blog_tittle:
-            return collection.find()
+        if not blog_filter and not blog_title:
+            print('No blog title or filter')
+            return json.loads(json_util.dumps(collection.find()))
         elif not blog_filter:
-            return collection.aggregate(pipeline)
-        elif not blog_tittle:
+            print('No blog filter')
+            print(list(collection.aggregate(pipeline)))
+            return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+        elif not blog_title:
+            print('No blog title')
             if blog_filter == "Newest":
-                return collection.find().sort("date_published", -1)
+                return json.loads(json_util.dumps(collection.find().sort("date_published", -1)))
             elif blog_filter == "Most read":
-                return collection.find().sort("read_count", -1)
+                return json.loads(json_util.dumps(collection.find().sort("read_count", -1)))
             elif blog_filter == "Most upvote":
-                return collection.find().sort("upvote_count", -1)
+                return json.loads(json_util.dumps(collection.find().sort("upvote_count", -1)))
 
             # this returns the blogs ordered "Oldest"
-            return collection.find().sort("date_published", 1)
+            return json.loads(json_util.dumps(collection.find().sort("date_published", 1)))
 
+        print('Blog title and filter')
         if blog_filter == "Newest":
             sort_criteria = {"date_published", -1}
             pipeline.append({"$sort": sort_criteria})
-            return collection.aggregate(pipeline)
+            return json.loads(json_util.dumps(collection.aggregate(pipeline)))
         elif blog_filter == "Most read":
             sort_criteria = {"read_count", -1}
             pipeline.append({"$sort": sort_criteria})
-            return collection.aggregate(pipeline)
+            return json.loads(json_util.dumps(collection.aggregate(pipeline)))
         elif blog_filter == "Most upvote":
             sort_criteria = {"upvote_count", -1}
             pipeline.append({"$sort": sort_criteria})
-            return collection.aggregate(pipeline)
+            return json.loads(json_util.dumps(collection.aggregate(pipeline)))
 
         sort_criteria = {"date_published", 1}
         pipeline.append({"$sort": sort_criteria})
-        return collection.aggregate(pipeline)
+        return json.loads(json_util.dumps(collection.aggregate(pipeline)))
 
     def to_json(self):
         """ Converts a blog object to json format
         """
-        return {'blog_id': self.blog_id, 'tittle': self.tittle, 'information': self.information, 'link': self.link,
+        return {'blog_id': self.blog_id, 'title': self.title, 'information': self.information, 'link': self.link,
                 'date_published': self.date_published, 'upvote_count': self.upvote_count, 'read_count': self.read_count,
                 'user_id': self.user_id}
