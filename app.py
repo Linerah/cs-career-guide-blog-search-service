@@ -1,8 +1,12 @@
 from flask import Flask, request
 import pymongo
+from flask_cors import CORS, cross_origin
+
 from blog import Blog
 
 app = Flask(__name__)
+cors = CORS(app)
+
 app.secret_key = b'\xcc^\x91\xea\x17-\xd0W\x03\xa7\xf8J0\xac8\xc5'
 
 app.config['MONGO_DBNAME'] = 'user_auth'
@@ -15,6 +19,7 @@ db = client['user-auth']
 
 @app.route("/")
 @app.route("/blogs", methods=["GET", "POST"])
+@cross_origin()
 def blogs():
     if request.method == "GET":
         all_blogs = Blog.get_blogs(db)
@@ -26,6 +31,7 @@ def blogs():
 
 
 @app.route("/create_blog", methods=["GET", "POST"])
+@cross_origin()
 def create_blog():
     if request.method == "POST":
         title = request.json['title']
