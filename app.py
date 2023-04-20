@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import pymongo
 from flask_cors import CORS, cross_origin
 
