@@ -41,8 +41,32 @@ class Blog:
         """ A static method, that gets all of the blogs in the database
         """
         collection = database.db.blogs  # TODO: try to see if Atlas search has an AI that orders by relevance
-        blogs = collection.find()
-        return json.loads(json_util.dumps(blogs))
+        pipeline = [
+            {
+                '$lookup': {
+                    'from': "users",
+                    'localField': "user_id",
+                    'foreignField': "_id",
+                    'as': "user_info"
+                }
+            },
+            {
+                '$project': {
+                    "_id": 0,
+                    "blog_id": 1,
+                    "title": 1,
+                    "information": 1,
+                    "link": 1,
+                    "read_count": 1,
+                    "upvote_count": 1,
+                    "date_published": 1,
+                    "user_info._id": 1,
+                    "user_info.email": 1,
+                    "user_info.name": 1
+                }
+            }
+        ]
+        return json.loads(json_util.dumps(collection.aggregate(pipeline)))
 
     @staticmethod
     def get_filtered_blogs(database, blog_filter, blog_title):
@@ -57,39 +81,118 @@ class Blog:
                     'index': 'blogs',
                     'text': query
                 }
+            },
+            {
+                '$lookup': {
+                    'from': "users",
+                    'localField': "user_id",
+                    'foreignField': "_id",
+                    'as': "user_info"
+                }
+            },
+            {
+                '$project': {
+                    "_id": 0,
+                    "blog_id": 1,
+                    "title": 1,
+                    "information": 1,
+                    "link": 1,
+                    "read_count": 1,
+                    "upvote_count": 1,
+                    "date_published": 1,
+                    "user_info._id": 1,
+                    "user_info.email": 1,
+                    "user_info.name": 1
+                }
             }
         ]
         if not blog_filter and not blog_title:
-            return json.loads(json_util.dumps(collection.find()))
+            return json.loads(json_util.dumps(collection.aggregate([{
+                '$lookup': {
+                    'from': "users",
+                    'localField': "user_id",
+                    'foreignField': "_id",
+                    'as': "user_info"
+                }
+            },
+                {
+                    '$project': {
+                        "_id": 0,
+                        "blog_id": 1,
+                        "title": 1,
+                        "information": 1,
+                        "link": 1,
+                        "read_count": 1,
+                        "upvote_count": 1,
+                        "date_published": 1,
+                        "user_info._id": 1,
+                        "user_info.email": 1,
+                        "user_info.name": 1
+                    }
+                }
+            ])))
         elif not blog_filter:
             return json.loads(json_util.dumps(collection.aggregate(pipeline)))
         elif not blog_title:
+            pipeline = [
+                {
+                    '$lookup': {
+                        'from': "users",
+                        'localField': "user_id",
+                        'foreignField': "_id",
+                        'as': "user_info"
+                    }
+                },
+                {
+                    '$project': {
+                        "_id": 0,
+                        "blog_id": 1,
+                        "title": 1,
+                        "information": 1,
+                        "link": 1,
+                        "read_count": 1,
+                        "upvote_count": 1,
+                        "date_published": 1,
+                        "user_info._id": 1,
+                        "user_info.email": 1,
+                        "user_info.name": 1
+                    }
+                }
+            ]
             if blog_filter == "Newest":
-                return json.loads(json_util.dumps(collection.find().sort("date_published", -1)))
+                sort_criteria = {"date_published": -1}
+                pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
             elif blog_filter == "Most read":
-                return json.loads(json_util.dumps(collection.find().sort("read_count", -1)))
+                sort_criteria = {"read_count": -1}
+                pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
             elif blog_filter == "Most upvote":
-                return json.loads(json_util.dumps(collection.find().sort("upvote_count", -1)))
-
-            # this returns the blogs ordered "Oldest"
-            return json.loads(json_util.dumps(collection.find().sort("date_published", 1)))
-
-        print('Blog title and filter')
-        if blog_filter == "Newest":
-            sort_criteria = {"date_published": -1}
-            pipeline.append({"$sort": sort_criteria})
-            return json.loads(json_util.dumps(collection.aggregate(pipeline)))
-        elif blog_filter == "Most read":
-            sort_criteria = {"read_count": -1}
-            pipeline.append({"$sort": sort_criteria})
-            return json.loads(json_util.dumps(collection.aggregate(pipeline)))
-        elif blog_filter == "Most upvote":
-            sort_criteria = {"upvote_count": -1}
-            pipeline.append({"$sort": sort_criteria})
-            return json.loads(json_util.dumps(collection.aggregate(pipeline)))
-        sort_criteria = {"date_published": 1}
-        pipeline.append({"$sort": sort_criteria})
-        return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+                sort_criteria = {"upvote_count": -1}
+                pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+            else:
+                # this returns the blogs ordered "Oldest"
+                sort_criteria = {"date_published": 1}
+                pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+        else:
+            if blog_filter == "Newest":
+                sort_criteria = {"date_published": -1}
+                pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+            elif blog_filter == "Most read":
+                sort_criteria = {"read_count": -1}
+                pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+            elif blog_filter == "Most upvote":
+                sort_criteria = {"upvote_count": -1}
+                pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+            else:
+                sort_criteria = {"date_published": 1}
+                pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
 
     def to_json(self):
         """ Converts a blog object to json format
