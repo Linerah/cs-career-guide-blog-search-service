@@ -43,5 +43,5 @@ def create_blog():
         Blog.create_blog(title, information, link, user_id, db)
         return jsonify({'result': "Successfully created Blog"})
 
-    all_blogs = Blog.get_blogs(db)
+    all_blogs = db.blogs.find()
     return all_blogs
