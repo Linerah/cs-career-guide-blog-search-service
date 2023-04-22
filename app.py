@@ -22,11 +22,13 @@ db = client['user-auth']
 @cross_origin()
 def blogs():
     if request.method == "GET":
-        all_blogs = Blog.get_blogs(db)
+        user_id = request.args.get('user_id')
+        all_blogs = Blog.get_blogs(db, user_id)
     else:
         blog_filter = request.json['blog-filter']
         blog_tittle = request.json['blog-title']
-        all_blogs = Blog.get_filtered_blogs(db, blog_filter, blog_tittle)
+        user_id = request.json['user_id']
+        all_blogs = Blog.get_filtered_blogs(db, blog_filter, blog_tittle, user_id)
     return all_blogs
 
 

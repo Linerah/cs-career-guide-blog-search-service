@@ -37,7 +37,7 @@ class Blog:
         return blog
 
     @staticmethod
-    def get_blogs(database):
+    def get_blogs(database, user_id):
         """ A static method, that gets all of the blogs in the database
         """
         collection = database.db.blogs  # TODO: try to see if Atlas search has an AI that orders by relevance
@@ -51,6 +51,26 @@ class Blog:
                 }
             },
             {
+                '$lookup': {
+                    "from": "upvote",
+                    "let": {"user_id": user_id,
+                            "blog_id": "$blog_id"},
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$and": [
+                                        {"$eq": ["$user_id", user_id]},
+                                        {"$eq": ["$blog_id", "$$blog_id"]}
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "as": "matchedDocuments"
+                }
+            },
+            {
                 '$project': {
                     "_id": 0,
                     "blog_id": 1,
@@ -59,6 +79,9 @@ class Blog:
                     "link": 1,
                     "read_count": 1,
                     "upvote_count": 1,
+                    "upvote": {
+                        '$ne': ["$matchedDocuments", []]
+                    },
                     "date_published": 1,
                     "user_info._id": 1,
                     "user_info.email": 1,
@@ -69,7 +92,7 @@ class Blog:
         return json.loads(json_util.dumps(collection.aggregate(pipeline)))
 
     @staticmethod
-    def get_filtered_blogs(database, blog_filter, blog_title):
+    def get_filtered_blogs(database, blog_filter, blog_title, user_id):
         """ A static method, that filters blogs by the given input from the user
         """
 
@@ -91,6 +114,26 @@ class Blog:
                 }
             },
             {
+                '$lookup': {
+                    "from": "upvote",
+                    "let": {"user_id": user_id,
+                            "blog_id": "$blog_id"},
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$and": [
+                                        {"$eq": ["$user_id", user_id]},
+                                        {"$eq": ["$blog_id", "$$blog_id"]}
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "as": "matchedDocuments"
+                }
+            },
+            {
                 '$project': {
                     "_id": 0,
                     "blog_id": 1,
@@ -99,6 +142,9 @@ class Blog:
                     "link": 1,
                     "read_count": 1,
                     "upvote_count": 1,
+                    "upvote": {
+                        '$ne': ["$matchedDocuments", []]
+                    },
                     "date_published": 1,
                     "user_info._id": 1,
                     "user_info.email": 1,
@@ -116,6 +162,26 @@ class Blog:
                 }
             },
                 {
+                    '$lookup': {
+                        "from": "upvote",
+                        "let": {"user_id": user_id,
+                                "blog_id": "$blog_id"},
+                        "pipeline": [
+                            {
+                                "$match": {
+                                    "$expr": {
+                                        "$and": [
+                                            {"$eq": ["$user_id", user_id]},
+                                            {"$eq": ["$blog_id", "$$blog_id"]}
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "as": "matchedDocuments"
+                    }
+                },
+                {
                     '$project': {
                         "_id": 0,
                         "blog_id": 1,
@@ -124,6 +190,9 @@ class Blog:
                         "link": 1,
                         "read_count": 1,
                         "upvote_count": 1,
+                        "upvote": {
+                            '$ne': ["$matchedDocuments", []]
+                        },
                         "date_published": 1,
                         "user_info._id": 1,
                         "user_info.email": 1,
@@ -144,6 +213,26 @@ class Blog:
                     }
                 },
                 {
+                    '$lookup': {
+                        "from": "upvote",
+                        "let": {"user_id": user_id,
+                                "blog_id": "$blog_id"},
+                        "pipeline": [
+                            {
+                                "$match": {
+                                    "$expr": {
+                                        "$and": [
+                                            {"$eq": ["$user_id", user_id]},
+                                            {"$eq": ["$blog_id", "$$blog_id"]}
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "as": "matchedDocuments"
+                    }
+                },
+                {
                     '$project': {
                         "_id": 0,
                         "blog_id": 1,
@@ -152,6 +241,9 @@ class Blog:
                         "link": 1,
                         "read_count": 1,
                         "upvote_count": 1,
+                        "upvote": {
+                            '$ne': ["$matchedDocuments", []]
+                        },
                         "date_published": 1,
                         "user_info._id": 1,
                         "user_info.email": 1,
