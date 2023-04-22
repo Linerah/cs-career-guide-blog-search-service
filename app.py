@@ -1,3 +1,6 @@
+import json
+
+from bson import json_util
 from flask import Flask, request, jsonify
 import pymongo
 from flask_cors import CORS, cross_origin
@@ -44,4 +47,4 @@ def create_blog():
         return jsonify({'result': "Successfully created Blog"})
 
     all_blogs = db.db.blogs.find()
-    return all_blogs
+    return json.loads(json_util.dumps(all_blogs))
