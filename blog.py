@@ -255,10 +255,6 @@ class Blog:
                 sort_criteria = {"date_published": -1}
                 pipeline.append({"$sort": sort_criteria})
                 return json.loads(json_util.dumps(collection.aggregate(pipeline)))
-            elif blog_filter == "Most read":
-                sort_criteria = {"read_count": -1}
-                pipeline.append({"$sort": sort_criteria})
-                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
             elif blog_filter == "Most upvote":
                 sort_criteria = {"upvote_count": -1}
                 pipeline.append({"$sort": sort_criteria})
@@ -271,10 +267,6 @@ class Blog:
         else:
             if blog_filter == "Newest":
                 sort_criteria = {"date_published": -1}
-                pipeline.append({"$sort": sort_criteria})
-                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
-            elif blog_filter == "Most read":
-                sort_criteria = {"read_count": -1}
                 pipeline.append({"$sort": sort_criteria})
                 return json.loads(json_util.dumps(collection.aggregate(pipeline)))
             elif blog_filter == "Most upvote":
