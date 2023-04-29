@@ -15,7 +15,8 @@ def generate_blog_id():
 
 class Blog:
 
-    def __init__(self, title, information, link, user_id):
+    def __init__(self, title, information, link, user_id, tag):
+        self.tag = tag
         self.blog_id = generate_blog_id()
         self.title = title
         self.information = information
@@ -25,11 +26,12 @@ class Blog:
         self.read_count = 0
         self.user_id = user_id
 
+
     @staticmethod
-    def create_blog(title, information, link, user_id, database):
+    def create_blog(title, information, link, user_id, database, tag):
         """ A static method, that creates a blog object and adds it to the database
         """
-        blog = Blog(title, information, link, user_id)
+        blog = Blog(title, information, link, user_id, tag)
         blog_document = blog.to_json()
         collection = database.db.blogs
         print(blog_document)
@@ -82,6 +84,7 @@ class Blog:
                     "upvote": {
                         '$ne': ["$matchedDocuments", []]
                     },
+                    "tag":1,
                     "date_published": 1,
                     "user_info._id": 1,
                     "user_info.email": 1,
@@ -145,6 +148,7 @@ class Blog:
                     "upvote": {
                         '$ne': ["$matchedDocuments", []]
                     },
+                    "tag": 1,
                     "date_published": 1,
                     "user_info._id": 1,
                     "user_info.email": 1,
@@ -193,6 +197,7 @@ class Blog:
                         "upvote": {
                             '$ne': ["$matchedDocuments", []]
                         },
+                        "tag": 1,
                         "date_published": 1,
                         "user_info._id": 1,
                         "user_info.email": 1,
@@ -244,6 +249,7 @@ class Blog:
                         "upvote": {
                             '$ne': ["$matchedDocuments", []]
                         },
+                        "tag": 1,
                         "date_published": 1,
                         "user_info._id": 1,
                         "user_info.email": 1,
@@ -283,4 +289,4 @@ class Blog:
         """
         return {'blog_id': self.blog_id, 'title': self.title, 'information': self.information, 'link': self.link,
                 'date_published': self.date_published, 'upvote_count': self.upvote_count, 'read_count': self.read_count,
-                'user_id': self.user_id}
+                'user_id': self.user_id, 'tag': self.tag}
