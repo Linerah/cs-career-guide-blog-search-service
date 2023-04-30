@@ -98,7 +98,7 @@ class Blog:
     def get_filtered_blogs(database, blog_filter, blog_title, user_id):
         """ A static method, that filters blogs by the given input from the user
         """
-
+        tagList = ['Programming Languages', 'Data Structures', 'Computer Architecture', 'Computer Networks', 'Cybersecurity', 'Databases', 'Software Engineering', 'Human/Computer Interaction', 'Artificial Intelligence']
         collection = database.db.blogs
         query = {'query': blog_title, 'path': ['title']}
         pipeline = [
@@ -265,6 +265,10 @@ class Blog:
                 sort_criteria = {"upvote_count": -1}
                 pipeline.append({"$sort": sort_criteria})
                 return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+            elif blog_filter in tagList:
+                sort_criteria = {"tag": blog_filter}
+                pipeline.append({"$match": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
             else:
                 # this returns the blogs ordered "Oldest"
                 sort_criteria = {"date_published": 1}
@@ -278,6 +282,10 @@ class Blog:
             elif blog_filter == "Most upvote":
                 sort_criteria = {"upvote_count": -1}
                 pipeline.append({"$sort": sort_criteria})
+                return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+            elif blog_filter in tagList:
+                sort_criteria = {"tag": blog_filter}
+                pipeline.append({"$match": sort_criteria})
                 return json.loads(json_util.dumps(collection.aggregate(pipeline)))
             else:
                 sort_criteria = {"date_published": 1}
