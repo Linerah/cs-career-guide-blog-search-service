@@ -43,7 +43,8 @@ def create_blog():
         information = request.json['information']
         link = request.json['link']
         user_id = request.json['user_id']
-        Blog.create_blog(title, information, link, user_id, db)
+        tag = request.json['tag']
+        Blog.create_blog(title, information, link, user_id, db, tag)
         return jsonify({'result': "Successfully created Blog"})
 
     all_blogs = db.db.blogs.find()
