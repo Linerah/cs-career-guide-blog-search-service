@@ -6,6 +6,7 @@ import pymongo
 from flask_cors import CORS, cross_origin
 
 from blog import Blog
+from research import Research
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -49,3 +50,41 @@ def create_blog():
 
     all_blogs = db.db.blogs.find()
     return json.loads(json_util.dumps(all_blogs))
+
+
+@app.route("/research", methods=["GET", "POST"])
+@cross_origin()
+def research():
+    if request.method == "GET":
+        user_id = request.args.get('user_id')
+        all_research = Research.get_research(db, user_id)
+    else:
+        research_filter = request.json['research-filter']
+        research_title = request.json['research-title']
+        user_id = request.json['user_id']
+        all_research = Research.get_filtered_research(db, research_filter, research_title, user_id)
+    return all_research
+
+
+@app.route("/create_research", methods=["POST"])
+@cross_origin()
+def create_research():
+    if request.method == "POST":
+        title = request.json['title']
+        information = request.json['information']
+        link = request.json['link']
+        user_id = request.json['user_id']
+        tag = request.json['tag']
+        file = request.json['file']
+        Research.create_research(title, information, link, user_id, db, tag, file)
+        return jsonify({'result': "Successfully created Research entry"})
+
+    all_research = db.db.research.find()
+    return json.loads(json_util.dumps(all_research))
+
+
+@app.route("/get_organization", methods=["GET"])
+@cross_origin()
+def get_orgs():
+    if request.method == "GET":
+        return json.loads(json_util.dumps(db.db.organization.find()))
