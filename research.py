@@ -50,25 +50,6 @@ class Research:
                 }
             },
             {
-                '$lookup': {
-                    "let": {"user_id": user_id,
-                            "research_id": "$research_id"},
-                    "pipeline": [
-                        {
-                            "$match": {
-                                "$expr": {
-                                    "$and": [
-                                        {"$eq": ["$user_id", user_id]},
-                                        {"$eq": ["$research_id", "$$research_id"]}
-                                    ]
-                                }
-                            }
-                        }
-                    ],
-                    "as": "matchedDocuments"
-                }
-            },
-            {
                 '$project': {
                     "_id": 0,
                     "research_id": 1,
