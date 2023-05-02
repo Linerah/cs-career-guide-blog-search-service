@@ -57,6 +57,7 @@ class Research:
                     "information": 1,
                     "link": 1,
                     "tag": 1,
+                    "file": 1,
                     "date_published": 1,
                     "user_info._id": 1,
                     "user_info.email": 1,
@@ -118,6 +119,7 @@ class Research:
                     "information": 1,
                     "link": 1,
                     "tag": 1,
+                    "file": 1,
                     "date_published": 1,
                     "user_info._id": 1,
                     "user_info.email": 1,
@@ -162,6 +164,7 @@ class Research:
                         "information": 1,
                         "link": 1,
                         "tag": 1,
+                        "file": 1,
                         "date_published": 1,
                         "user_info._id": 1,
                         "user_info.email": 1,
@@ -209,6 +212,7 @@ class Research:
                         "information": 1,
                         "link": 1,
                         "tag": 1,
+                        "file":1,
                         "date_published": 1,
                         "user_info._id": 1,
                         "user_info.email": 1,
@@ -248,4 +252,4 @@ class Research:
         """
         return {'research_id': self.research_id, 'title': self.title, 'information': self.information,
                 'link': self.link,
-                'date_published': self.date_published, 'user_id': self.user_id, 'tag': self.tag}
+                'date_published': self.date_published, 'user_id': self.user_id, 'tag': self.tag, 'file': self.file}
