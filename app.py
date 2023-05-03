@@ -83,6 +83,22 @@ def create_research():
     return json.loads(json_util.dumps(all_research))
 
 
+@app.route("/delete_blog/<string:blog_id>", methods=["DELETE"])
+@cross_origin()
+def delete_blog(blog_id):
+    if request.method == "DELETE":
+        Blog.delete(db, blog_id)
+        return jsonify({'result': "Successfully deleted Blog"})
+
+
+@app.route("/delete_research/<string:research_id>", methods=["DELETE"])
+@cross_origin()
+def delete_research(research_id):
+    if request.method == "DELETE":
+        Research.delete(db, research_id)
+        return jsonify({'result': "Successfully deleted Research"})
+
+
 @app.route("/get_organization", methods=["GET"])
 @cross_origin()
 def get_orgs():

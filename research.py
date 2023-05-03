@@ -247,6 +247,11 @@ class Research:
                 pipeline.append({"$sort": sort_criteria})
                 return json.loads(json_util.dumps(collection.aggregate(pipeline)))
 
+    @staticmethod
+    def delete(database, research_id):
+        database.db.research.delete_one({'research_id': research_id})
+        return 'Deleted successfully'
+
     def to_json(self):
         """ Converts a research object to json format
         """
