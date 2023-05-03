@@ -26,7 +26,6 @@ class Blog:
         self.read_count = 0
         self.user_id = user_id
 
-
     @staticmethod
     def create_blog(title, information, link, user_id, database, tag):
         """ A static method, that creates a blog object and adds it to the database
@@ -84,7 +83,7 @@ class Blog:
                     "upvote": {
                         '$ne': ["$matchedDocuments", []]
                     },
-                    "tag":1,
+                    "tag": 1,
                     "date_published": 1,
                     "user_info._id": 1,
                     "user_info.email": 1,
@@ -98,7 +97,9 @@ class Blog:
     def get_filtered_blogs(database, blog_filter, blog_title, user_id):
         """ A static method, that filters blogs by the given input from the user
         """
-        tagList = ['Programming Languages', 'Data Structures', 'Computer Architecture', 'Computer Networks', 'Cybersecurity', 'Databases', 'Software Engineering', 'Human/Computer Interaction', 'Artificial Intelligence']
+        tagList = ['Programming Languages', 'Data Structures', 'Computer Architecture', 'Computer Networks',
+                   'Cybersecurity', 'Databases', 'Software Engineering', 'Human/Computer Interaction',
+                   'Artificial Intelligence']
         collection = database.db.blogs
         query = {'query': blog_title, 'path': ['title']}
         pipeline = [
@@ -291,6 +292,11 @@ class Blog:
                 sort_criteria = {"date_published": 1}
                 pipeline.append({"$sort": sort_criteria})
                 return json.loads(json_util.dumps(collection.aggregate(pipeline)))
+
+    @staticmethod
+    def delete(database, blog_id):
+        database.db.blogs.delete_one({'blog_id': blog_id})
+        return 'Deleted successfully'
 
     def to_json(self):
         """ Converts a blog object to json format
